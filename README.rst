@@ -12,12 +12,12 @@ It is based on boto and provides following features:
 * in-memory cached tables to speedup computational operations on top of DynamoDB - all data is read only once and then results are flushed back in a batch
 * additional tools - copy data from table to table, a context manager to update table throughputs and set back once operation is completed
 
-`Discussion group<https://groups.google.com/forum/#!forum/dynamo_objects>`_
+`Discussion group <https://groups.google.com/forum/#!forum/dynamo_objects>`_
 
 ========
 Related projects
 ========
 
-* `flywheel<https://github.com/mathcamp/flywheel>`_ - Object mapper for Amazon's DynamoDB)
-* `PynamoDB<https://github.com/jlafon/PynamoDB>`_ - A pythonic interface to Amazon's DynamoDB
-* `Dynamodb-mapper<https://bitbucket.org/Ludia/dynamodb-mapper/overview>`_ Dynamodb-mapper - a DynamoDB object mapper, based on boto
+* `flywheel <https://github.com/mathcamp/flywheel>`_ - Object mapper for Amazon's DynamoDB)
+* `PynamoDB <https://github.com/jlafon/PynamoDB>`_ - A pythonic interface to Amazon's DynamoDB
+* `Dynamodb-mapper <https://bitbucket.org/Ludia/dynamodb-mapper/overview>`_ Dynamodb-mapper - a DynamoDB object mapper, based on boto
