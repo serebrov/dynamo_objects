@@ -45,7 +45,7 @@ class InvalidKeysException(DynamoException):
         return self.empty_keys
 
 
-class Database(object):
+class DynamoDatabase(object):
     _db_connection = None
     local_dynamodb = False
     table_prefix = ''
@@ -55,53 +55,53 @@ class Database(object):
         pass
 
     def get_connection(self):
-        if Database._db_connection is None:
+        if DynamoDatabase._db_connection is None:
             raise DynamoException('No connection, use connect() method to connect to the database')
-        return Database._db_connection
+        return DynamoDatabase._db_connection
 
     def connect(self, **kwargs):
         if 'table_prefix' in kwargs:
-            Database.table_prefix = kwargs['table_prefix']
+            DynamoDatabase.table_prefix = kwargs['table_prefix']
             del kwargs['table_prefix']
-        if Database._db_connection is not None:
+        if DynamoDatabase._db_connection is not None:
             raise DynamoException('Already connected, use disconnect() before making a new connection')
         if 'region_name' in kwargs and kwargs['region_name'] == 'localhost': # local dynamodb
-            Database._db_connection = boto.dynamodb2.layer1.DynamoDBConnection(
+            DynamoDatabase._db_connection = boto.dynamodb2.layer1.DynamoDBConnection(
                 host='localhost',
                 port=kwargs.get('DYNAMODB_PORT', 8000),
                 aws_access_key_id='local',
                 aws_secret_access_key='success',
                 is_secure=False)
-            Database.local_dynamodb = True
+            DynamoDatabase.local_dynamodb = True
         else: # Real dynamo db
-            Database._db_connection = boto.dynamodb2.connect_to_region(**kwargs)
+            DynamoDatabase._db_connection = boto.dynamodb2.connect_to_region(**kwargs)
         self.get_tables()
-        return Database._db_connection
+        return DynamoDatabase._db_connection
 
     def disconnect(self):
-        if Database._db_connection is not None:
-            del Database._db_connection
-            Database._db_connection = None
+        if DynamoDatabase._db_connection is not None:
+            del DynamoDatabase._db_connection
+            DynamoDatabase._db_connection = None
 
     def connected(self):
-        return Database._db_connection is not None
+        return DynamoDatabase._db_connection is not None
 
     def is_local_db(self):
         if self.get_connection():
-            return Database.local_dynamodb
+            return DynamoDatabase.local_dynamodb
 
     def get_tables(self):
-        Database.tables = self.get_connection().list_tables()
-        if not Database.tables:
-            raise DynamoException('Unable to get database tables, connection: %s' % str(Database.db_connection))
-        return Database.tables['TableNames']
+        DynamoDatabase.tables = self.get_connection().list_tables()
+        if not DynamoDatabase.tables:
+            raise DynamoException('Unable to get database tables, connection: %s' % str(DynamoDatabase.db_connection))
+        return DynamoDatabase.tables['TableNames']
 
     def get_table_name(self, table_name):
-        return Database.table_prefix + table_name
+        return DynamoDatabase.table_prefix + table_name
 
     def exists(self, table_name):
         if self.get_connection():
-            return self.get_table_name(table_name) in Database.tables['TableNames']
+            return self.get_table_name(table_name) in DynamoDatabase.tables['TableNames']
         return False
 
     def check_exists(self, table):
@@ -226,7 +226,7 @@ class TablesThroughput(object):
                 'MyIndex1': {'read':1,'write':10'}
         }
         """
-        self.db = Database()
+        self.db = DynamoDatabase()
         self.restore = restore
         self.wait_enter = wait_enter
         self.wait_exit = wait_exit
@@ -370,7 +370,7 @@ class DynamoTable(object):
     #
 
     def __init__(self, table_name, schema, throughput, record_class, global_indexes=None):
-        self.db = Database()
+        self.db = DynamoDatabase()
         self.table_name = table_name
         self.schema = schema
         self.global_indexes = global_indexes

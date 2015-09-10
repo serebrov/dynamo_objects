@@ -11,6 +11,8 @@ It is based on boto and provides following features:
 - in-memory cached tables to speedup computational operations on top of DynamoDB - all data is read only once and then results are flushed back in a batch
 - additional tools - copy data from table to table, a context manager to update table throughputs and set back once operation is completed
 
+`Discussion group<https://groups.google.com/forum/#!forum/dynamo_objects>`
+
 ========
 Related projects
 ========
