@@ -4,7 +4,7 @@ dynamo_objects
 
 dynamo_objects is a set of tools to work with DynamoDB in python.
 
-It is based on boto and provides following features:
+It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`_ and provides following features:
 
 * a simple object mapper - use object notation to work with dynamo records
 * new tables are automatically created, so you just write the new code and deploy to production, new tables are added automatically
