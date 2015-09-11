@@ -46,22 +46,21 @@ On the CI server tests a launched two times - first against the in-memory mock a
 
 Here is a shell script example to to this:
 
-```bash
-# Run fast tests with in-memory mock
-python -m unittest discover -s tests
-RESULT_MOCK=$?
-
-# Run slow tests with DynamoDB local
-pushd paty/to/folder/with/dynamodb-local
-  java -Djava.library.path=./DynamoDBLocal_lib -jar ./DynamoDBLocal.jar -inMemory -sharedDb &
-  PID=$!
-popd
-echo "Started local dynamodb: $PID"
-DYNAMODB_MOCK= python -m unittest discover -s tests
-RESULT_LOCALDB=$?
-kill -9 $PID
-exit $(($RESULT_MOCK+$RESULT_LOCALDB))
-```
+.. code:: bash
+  # Run fast tests with in-memory mock
+  python -m unittest discover -s tests
+  RESULT_MOCK=$?
+  
+  # Run slow tests with DynamoDB local
+  pushd paty/to/folder/with/dynamodb-local
+    java -Djava.library.path=./DynamoDBLocal_lib -jar ./DynamoDBLocal.jar -inMemory -sharedDb &
+    PID=$!
+  popd
+  echo "Started local dynamodb: $PID"
+  DYNAMODB_MOCK= python -m unittest discover -s tests
+  RESULT_LOCALDB=$?
+  kill -9 $PID
+  exit $(($RESULT_MOCK+$RESULT_LOCALDB))
 
 ========
 Additional Tools
