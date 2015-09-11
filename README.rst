@@ -29,19 +29,38 @@ Object Mapper
 Testing
 ========
 
-Tests structure and description.
+While it is possible to run unit tests using the real DynamoDB connection, using the table prefixes feature you can choose some special table prefix like `xx_unit_tests_`. 
+This way you'll have a set of tables for your unit tests.
+But it is not practical - tests will be slow and will consume the read/write operations (and this will cost money).
 
-Run tests with in-memory mock.
+Amazon provides a `DynamoDB emulator in java <https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/>`_ but it is problematic to use it during development, because it is slow and consumes a lot of memory.
 
-./tool/test.py
+The solution is a simple in-memory `DynamoDB mock module <dynamo_objects/dynamock.py>`_. 
+It is a fast, but very approximate dynamo emulation without permanent data storage.
 
-Run tests with DynamoDB local
+You can find examples of unit tests under the `tests <tests/>`_ folder. The database schema is described in the `tests/schema.py <tests/schema.py>`_.
+The same structure and approach can be used to write unit tests for your project.
 
-./tool/dynamodb-local.sh
+There is a helper `test.py <tools/test.py>`_ script to run all unit tests:
 
-DYNAMODB_MOCK= ./test.py
+.. code-block:: bash
+
+    ./tool/test.py
+
+By default it will use the in-memory `DynamoDB mock <dynamo_objects/dynamock.py>`_. 
+To run tests against the  DynamoDB Local use following commands:
+
+.. code-block:: bash
+
+    # in the first terminal window launch the local dynamodb
+    # script will download it if necessary
+    ./tool/dynamodb-local.sh
+
+    # in another terminal window run the tests
+    DYNAMODB_MOCK= ./test.py
 
 I use fast in-memory mock to run tests locally, during the development.
+
 On the CI server tests a launched two times - first against the in-memory mock and then one more time against the DynamoDB local.
 
 Here is a shell script example to to this:
