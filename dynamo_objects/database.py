@@ -1,13 +1,10 @@
 import time
 import copy
 import boto
-import datetime
 
 from boto.dynamodb2.table import Table
 from boto.dynamodb2.items import Item
 from boto.dynamodb2.exceptions import ItemNotFound
-from boto.dynamodb2.fields import HashKey, RangeKey, GlobalAllIndex
-from boto.dynamodb2.types import NUMBER, STRING
 
 
 def item_to_dict(item, deep=True, set_to_list=False):
@@ -388,8 +385,8 @@ class DynamoTable(object):
         try:
             keys_data = self._get_keys_dict(hashkey, rangekey)
         except InvalidKeysException as e:
-            # if we do something like MyTable().get('') - return
-            # None (nothing found)
+            # if we do something like MyTable().get('') - raise
+            # ItemNotFound (nothing found)
             if e.is_empty_keys():
                 raise ItemNotFound()
             else:

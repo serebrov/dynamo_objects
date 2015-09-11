@@ -1,0 +1,8 @@
+*.tags
+*.pyc
+*.py~
+*.orig
+*.log
+*sqlite.db
+.ropeproject
+tool/dynamodb_local
