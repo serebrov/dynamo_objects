@@ -46,7 +46,7 @@ On the CI server tests a launched two times - first against the in-memory mock a
 
 Here is a shell script example to to this:
 
-.. code:: bash
+.. code-block:: bash
   # Run fast tests with in-memory mock
   python -m unittest discover -s tests
   RESULT_MOCK=$?
