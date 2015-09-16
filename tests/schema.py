@@ -87,7 +87,7 @@ class Customer(DynamoRecord):
         self.employee_at_store = ''
         super(Customer, self).__init__(**data)
 
-    def check_attrs(self, data):
+    def _freeze_schema(self, data):
         # we actually go schema-less here and allow any fields
         pass
 

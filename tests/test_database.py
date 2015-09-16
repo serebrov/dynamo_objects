@@ -7,23 +7,22 @@ import os
 
 class DbTest(BaseDynamoTest):
 
-    def test_store_get_empty(self):
-        result = False
-        try:
+    def test_get_empty(self):
+        with self.assertRaises(database.ItemNotFound):
             StoreTable().get('')
-        except database.ItemNotFound:
-            result = True
-        self.assertTrue(result)
 
-    def test_store_create_empty(self):
-        message = ''
-        try:
-            store = Store()
+    def test_create_empty(self):
+        store = Store()
+        with self.assertRaises(database.InvalidKeysException) as context_manager:
             StoreTable().save(store)
-        except database.InvalidKeysException as e:
-            message = e.message
+        e = context_manager.exception
         self.assertEquals(
-            "Hash / range keys for <class 'schema.StoreTable'> are invalid or empty: {'store_id': None, None: None}", message)
+            "Hash / range keys for <class 'schema.StoreTable'> are invalid or empty: {'store_id': None, None: None}", e.message)
+
+    def test_wrong_field_name(self):
+        store = Store(store_id=1)
+        with self.assertRaises(database.DynamoSchemaException):
+            store.ctiy = 'test'
 
     # def test_visit_get_no_range(self):
     #     message = ''
