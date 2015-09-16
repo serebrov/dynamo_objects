@@ -8,7 +8,7 @@ It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`
 
 * a simple object mapper - use object notation to work with dynamo records
 * new tables are automatically created in the database, so you just write 
-  the new code and deploy to the server and tables are added automatically
+  and deploy the new code
 * transparent support for table prefixes (multiple databases or multiple environments), you don't need to handle table prefixes in code, just set the prefix during the database connection
 * simple in-memory dynamodb mock for fast unit tests
 * supports `DynamoDB local <https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/>`_ for slower tests
@@ -21,8 +21,110 @@ It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`
 DB Connection and Table Perfixes
 ========
 
+Use the following snippet to connect to the database:
+
+.. code-block:: python
+
+    from dynamo_objects import database
+
+    database.Database().connect(
+        region_name='your-aws-region-name-here',
+        aws_access_key_id='access-key-id',
+        aws_secret_access_key='secret-access-key',
+        table_prefix='my_prefix_')
+
+Region name, and aws credentials are passed to the boto's connect_to_region method, so you can use other ways `suppored by boto <http://boto.readthedocs.org/en/latest/boto_config_tut.html#credentials>`_ to specify aws credentials.
+For example, it is not necessary to specify access key id and secret if you use IAM role.
+
+The `table_prefix` parameter is used to prefix all the table names with the string you specify.
+Like if you set the table_prefix to `staging_`, the application will use tables like `staging_user` and `staging_post`. And if you set the prefix to `dev_` then application will use `dev_user`, 'dev_post`.
+If you leave the table_prefix empty then it will be just `user` and `post`.
+This way you can easily switch your application from one set of tables to another for different environments (development, staging, production).
+
+To connect to the DynamoDB Local, specify the region_name='localhost':
+
+.. code-block:: python
+
+        database.Database().connect(
+            region_name='localhost',
+            table_prefix='dev_'
+        )
+
 ========
 Object Mapper
+========
+
+To use the object mapper, define record and table objects for each DynamoDB table:
+
+.. code-block:: python
+
+  class Store(DynamoRecord):
+
+      def __init__(self, **data):
+          # define table fields in the __init__ method
+          self.store_id = ''
+          self.name = ''
+          self.tags = []
+          super(Store, self).__init__(**data)
+
+
+  class StoreTable(DynamoTable):
+
+      def __init__(self):
+          super(self.__class__, self).__init__(
+              'store',
+              schema=[HashKey('store_id')],
+              throughput={'read': 3, 'write': 3},
+              record_class=Store)
+
+Here the `StoreTable` class describes the table: table name, schema (hash and optionally range keys), throughput and record class.
+
+And the `Store` class describes the table row, 
+in the :code:`__init__` method we put all the table fields.
+
+See more examples of table/record objects in the `tests/schema.py <tests/schema.py>`_ file.
+
+Now the record object can be created and used like this:
+
+.. code-block:: python
+
+    store = StoreTable()
+    store = Store()
+    store.name = 'My Store'
+    table.save(store)
+
+    # or initialize the fields using the constructor
+    store2 = Store(name='My Store 2')
+    # change the name
+    store2.name = 'Another Store'
+    StoreTable().save(store)
+
+Compare this to pure boto where you have a dictionary-like interface:
+
+.. code-block:: python
+    store = Item(stores, data={
+       name='My Store'
+    })
+    # ....
+    store['nmae'] = 'Another Store'
+
+If you mistype the field name like in `store['nmae']` there will be no error - you will just create a new field in the database.
+The main purpose of the object mapper is to prevent this. 
+
+The `DynamoRecord` object will raise an exception if you mistype the field name.
+To actually go schema-less, it is possible to override the `_freeze_schema` method with `pass` in the method body.
+
+You can also override the `_check_data` method to do additional transformations before saving to the database (like convert data types or normalize/unify data format).
+
+========
+Memory tables
+========
+
+Memory tables can be used to cache DynamoDB access in-memory.
+Every record is only read once and no data is written until you call the `batch_write` method.
+
+========
+DynamoDB Mock
 ========
 
 ========
@@ -86,6 +188,8 @@ Here is a shell script example to to this:
 ========
 Additional Tools
 ========
+
+DB - copy table
 
 ========
 Related projects
