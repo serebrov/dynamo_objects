@@ -27,6 +27,10 @@ class DynamoException(Exception):
     pass
 
 
+class DynamoSchemaException(DynamoException):
+    pass
+
+
 class InvalidKeysException(DynamoException):
 
     def __init__(self, record, hashkey, rangekey):
@@ -290,27 +294,22 @@ class TablesThroughput(object):
 
 class DynamoRecord(object):
 
+    _strict_schema = False
+
     def __init__(self, **data):
         self._item = None
-        self.check_attrs(data)
+        self._freeze_schema()
         self.update_data(**data)
         self._check_data()
 
     def update_data(self, **data):
         self.__dict__.update(data)
 
-    def check_attrs(self, data):
-        for key in data:
-            if not hasattr(self, key):
-                raise DynamoException(
-                    "DynamoRecord %s doesn't have '%s' attribute" %
-                    (self.__class__, key)
-                )
-
     def get_dict(self, exclude=None):
         exclude = exclude or []
         self._check_data()
         data = copy.copy(self.__dict__)
+        self._check_attrs(data)
         for key in self.__dict__:
             if key.startswith('_') or key in exclude:
                 del data[key]
@@ -318,6 +317,17 @@ class DynamoRecord(object):
 
     def _check_data(self):
         pass
+
+    def _freeze_schema(self):
+        self._strict_schema = True
+
+    def __setattr__(self, key, value):
+        if self._strict_schema and not hasattr(self, key):
+            raise DynamoSchemaException(
+                "DynamoRecord %s doesn't have '%s' attribute, can not set it to '%s'" %
+                (self.__class__, key, value)
+            )
+        object.__setattr__(self, key, value)
 
 
 class DynamoTable(object):
