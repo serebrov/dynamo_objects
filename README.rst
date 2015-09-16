@@ -102,6 +102,7 @@ Now the record object can be created and used like this:
 Compare this to pure boto where you have a dictionary-like interface:
 
 .. code-block:: python
+
     store = Item(stores, data={
        name='My Store'
     })
@@ -116,12 +117,115 @@ To actually go schema-less, it is possible to override the `_freeze_schema` meth
 
 You can also override the `_check_data` method to do additional transformations before saving to the database (like convert data types or normalize/unify data format).
 
+Find a record, update it and save:
+
+.. code-block:: python
+
+    table = MyTable()
+    # will raise ItemNotFound exception if record does not exist
+    record = table.get('my_hash', 'my_range')
+    record.some_field = 100
+    table.save(record)
+
+    # get a record or create new one if record does not exist
+    record = table.get('my_hash', 'my_range', create=True)
+    record.some_field = 200
+    table.save(record)
+
+    # delete the existing record
+    # `delete` method will return the deleted record, so the record data can be
+    # used for some additional actions like logging
+    record = table.delete('hash', 'range')
+
+The `create=True` option for the `table.get()` method is useful when you want to read the data from the database or get the Null object if data is not found.
+For example:
+
+.. code-block:: python
+
+    class User(DynamoRecord):
+
+      def __init__(self, *data):
+         self.name = 'guest'
+         self.password = ''
+         super(User, self).__init__(**data)
+
+    # Find the user in the database, if not found - the `user` object 
+    # will represent guest user
+    user = table.get(user_id, create=True)
+    # print user name or 'guest' (default)
+    print user.name
+
+Query and scan methods have the same interface as boto's `query_2 <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.query_2>`_ and `scan <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.scan>`, but will convert the resulting record set into `DynamoRecord` objects.
+
+.. code-block:: python
+
+    # parameters are the same as for boto's query_2
+    # returns array of records
+    # don't use when you expect a lot of data, because it will
+    # fetch all the data from the database and convert to DynamoRecord
+    # before returning
+    records = table.query(hash__eq='value', range__gte=50)
+    ...
+    records = table.scan(some_filed__gte=10)
+
+And it is also possible to use boto's objects directly:
+
+.. code-block:: python
+
+    table = MyTable()
+    # the boto Table object
+    boto_table == table.table
+
+    record = table.get('my_hash', 'my_range')
+    # the boto Item object
+    boto_item = record._item
+
+
 ========
 Memory tables
 ========
 
 Memory tables can be used to cache DynamoDB access in-memory.
-Every record is only read once and no data is written until you call the `batch_write` method.
+Every record is only read once and no data is written until you call the `save_data` or `save_data_batch` method.
+
+.. code-block:: python
+
+  # StoreTable is a regular table definition, DynamoTable subclass
+  from myschema import StoreTable
+  from dynamo_objects.memorydb import MemoryTable
+
+  class StoreMemoryTable(MemoryTable):
+
+      def __init__(self):
+          super(StoreMemoryTable, self).__init__(StoreTable())
+
+Here we define a `StoreMemoryTable` class for in-memory table which wraps the `StoreTable` (a regular table definition).
+Now we can do this:
+
+
+.. code-block:: python
+
+    table = StoreMemoryTable()
+    # read records with store_id = 1 and store_id = 2
+    record = table.get(1)
+    record2 = table.get(2)
+    # data is not actually saved yet, no write db operations
+    table.save(record)
+    table.save(record2)
+    # ...
+    # read same records again - will fetch from memory, no db read operations
+    record = table.get(1)
+    record2 = table.get(2)
+    # ...
+    # data is not actually saved yet, no write db operations
+    table.save(record)
+    table.save(record2)
+    # Now we flush all the data back to DynamoDB
+    # the `save_data_batch` will use the `batch write` DynamoDB operation
+    table.save_data_batch()
+
+This can be very useful if you do some computational operations and need to read / write a lot of small objects to the database.
+Depending on the data structure the used read / write throughput and the whole processing time can be noticeably reduced.
 
 ========
 DynamoDB Mock
@@ -190,6 +294,7 @@ Additional Tools
 ========
 
 DB - copy table
+TableThroughputs
 
 ========
 Related projects

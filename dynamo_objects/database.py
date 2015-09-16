@@ -332,50 +332,6 @@ class DynamoRecord(object):
 
 class DynamoTable(object):
 
-    # Create a new record and save it
-    #
-    #   record = MyRecord(hash='value1', range='value2', field1='x')
-    #   record.field2 = 100
-    #   MyRecordTable().save(record)
-    #
-    #
-    # Find or create record, change data and save:
-    #
-    #   table = MyRecordTable()
-    #   # get a record or create new one
-    #   record = table.get('value1', 'value2', create=True)
-    #   record.field1 = 100
-    #   table.save(record)
-    #
-    # The 'create=True' option is also useful if you whether read data from
-    # db or need to get Null-object with sane empty defaults, like
-    #
-    #  class User(DynamoRecord):
-    #
-    #    def __init__(self, *data):
-    #       self.name = 'guest'
-    #       self.password = ''
-    #       super(User, self).__init__(**data)
-    #
-    #  user = table.get(user_id, create=True)
-    #  # print user name or 'guest' (default)
-    #  print user.name
-    #
-    # Delete record:
-    #
-    #   # will return deleted record
-    #   record = table.delete('hash', 'range')
-    #
-    # Query:
-    #
-    #   # parameters are the same as for boto's query_2
-    #   # returns array of records
-    #   # don't use when you expect a lot of data, because it will
-    #   # fetch all the data from the database and convert to DynamoRecord
-    #   # before returning
-    #   records = table.query(hash__eq='value', range__gte=50')
-    #
-
     def __init__(self, table_name, schema, throughput, record_class, global_indexes=None):
         self.db = DynamoDatabase()
         self.table_name = table_name
