@@ -21,6 +21,9 @@ It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`
 DB Connection and Table Perfixes
 ========
 
+Database connection method adds table prefix support on top of boto's connect_to_region method.
+Using the table prefix it is possible to switch the application to different set of tables for different environments (or just use different prefixes for different applications).
+
 Use the following snippet to connect to the database:
 
 .. code-block:: python
@@ -36,9 +39,11 @@ Use the following snippet to connect to the database:
 Region name, and aws credentials are passed to the boto's connect_to_region method, so you can use other ways `suppored by boto <http://boto.readthedocs.org/en/latest/boto_config_tut.html#credentials>`_ to specify aws credentials.
 For example, it is not necessary to specify access key id and secret if you use IAM role.
 
-The `table_prefix` parameter is used to prefix all the table names with the string you specify.
-Like if you set the table_prefix to `staging_`, the application will use tables like `staging_user` and `staging_post`. And if you set the prefix to `dev_` then application will use `dev_user`, 'dev_post`.
-If you leave the table_prefix empty then it will be just `user` and `post`.
+The :code:`table_prefix` parameter is used to prefix all the table names with the string you specify.
+
+Like if you set the table_prefix to :code:`staging_`, the application will use tables like :code:`staging_user` and :code:`staging_post`. And if you set the prefix to :code:`dev_` then application will use :code:`dev_user`, :code:`dev_post`.
+
+If you leave the table_prefix empty then it will be just :code:`user` and :code:`post`.
 This way you can easily switch your application from one set of tables to another for different environments (development, staging, production).
 
 To connect to the DynamoDB Local, specify the region_name='localhost':
@@ -77,9 +82,9 @@ To use the object mapper, define record and table objects for each DynamoDB tabl
               throughput={'read': 3, 'write': 3},
               record_class=Store)
 
-Here the `StoreTable` class describes the table: table name, schema (hash and optionally range keys), throughput and record class.
+Here the :code:`StoreTable` class describes the table: table name, schema (hash and optionally range keys), throughput and record class.
 
-And the `Store` class describes the table row, 
+And the :code:`Store` class describes the table row, 
 in the :code:`__init__` method we put all the table fields.
 
 See more examples of table/record objects in the `tests/schema.py <tests/schema.py>`_ file.
@@ -109,13 +114,13 @@ Compare this to pure boto where you have a dictionary-like interface:
     # ....
     store['nmae'] = 'Another Store'
 
-If you mistype the field name like in `store['nmae']` there will be no error - you will just create a new field in the database.
+If you mistype the field name like in :code:`store['nmae']` there will be no error - you will just create a new field in the database.
 The main purpose of the object mapper is to prevent this. 
 
-The `DynamoRecord` object will raise an exception if you mistype the field name.
-To actually go schema-less, it is possible to override the `_freeze_schema` method with `pass` in the method body.
+The :code:`DynamoRecord` object will raise an exception if you mistype the field name.
+To actually go schema-less, it is possible to override the :code:`_freeze_schema` method with :code:`pass` in the method body.
 
-You can also override the `_check_data` method to do additional transformations before saving to the database (like convert data types or normalize/unify data format).
+You can also override the :code:`_check_data` method to do additional transformations before saving to the database (like convert data types or normalize/unify data format).
 
 Find a record, update it and save:
 
@@ -137,7 +142,7 @@ Find a record, update it and save:
     # used for some additional actions like logging
     record = table.delete('hash', 'range')
 
-The `create=True` option for the `table.get()` method is useful when you want to read the data from the database or get the Null object if data is not found.
+The :code:`create=True` option for the :code:`table.get()` method is useful when you want to read the data from the database or get the Null object if data is not found.
 For example:
 
 .. code-block:: python
@@ -155,7 +160,7 @@ For example:
     # print user name or 'guest' (default)
     print user.name
 
-Query and scan methods have the same interface as boto's `query_2 <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.query_2>`_ and `scan <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.scan>`, but will convert the resulting record set into `DynamoRecord` objects.
+Query and scan methods have the same interface as boto's `query_2 <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.query_2>`_ and `scan <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.scan>`, but will convert the resulting record set into :code:`DynamoRecord` objects.
 
 .. code-block:: python
 
@@ -186,7 +191,7 @@ Memory tables
 ========
 
 Memory tables can be used to cache DynamoDB access in-memory.
-Every record is only read once and no data is written until you call the `save_data` or `save_data_batch` method.
+Every record is only read once and no data is written until you call the :code:`save_data` or :code:`save_data_batch` method.
 
 .. code-block:: python
 
@@ -199,7 +204,7 @@ Every record is only read once and no data is written until you call the `save_d
       def __init__(self):
           super(StoreMemoryTable, self).__init__(StoreTable())
 
-Here we define a `StoreMemoryTable` class for in-memory table which wraps the `StoreTable` (a regular table definition).
+Here we define a :code:`StoreMemoryTable` class for in-memory table which wraps the :code:`StoreTable` (a regular table definition).
 Now we can do this:
 
 
@@ -235,7 +240,7 @@ DynamoDB Mock
 Testing
 ========
 
-While it is possible to run unit tests using the real DynamoDB connection, using the table prefixes feature you can choose some special table prefix like `xx_unit_tests_`. 
+While it is possible to run unit tests using the real DynamoDB connection, using the table prefixes feature you can choose some special table prefix like :code:`xx_unit_tests_`. 
 This way you'll have a set of tables for your unit tests.
 But it is not practical - tests will be slow and will consume the read/write operations (and this will cost money).
 
