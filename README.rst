@@ -187,7 +187,7 @@ Query and scan methods have the same interface as boto's `query_2 <http://boto.r
     # before returning
     records = table.query(hash__eq='value', range__gte=50)
     ...
-    records = table.scan(some_filed__gte=10)
+    records = table.scan(some_field__gte=10)
 
 And it is also possible to use boto's objects directly:
 
@@ -195,11 +195,13 @@ And it is also possible to use boto's objects directly:
 
     table = MyTable()
     # the boto Table object
-    boto_table == table.table
+    boto_table = table.table
+    # ... 
 
     record = table.get('my_hash', 'my_range')
     # the boto Item object
     boto_item = record._item
+    # ... 
 
 
 ========
@@ -249,24 +251,33 @@ This can be very useful if you do some computational operations and need to read
 Depending on the data structure the used read / write throughput and the whole processing time can be noticeably reduced.
 
 ========
-DynamoDB Mock
+Testing and DynamoDB Mock
 ========
 
-========
-Testing
-========
-
-While it is possible to run unit tests using the real DynamoDB connection, using the table prefixes feature you can choose some special table prefix like :code:`xx_unit_tests_`. 
+It is possible to run unit tests using the real DynamoDB connection using the table prefixes feature: you can choose some special table prefix like :code:`xx_unit_tests_`. 
 This way you'll have a set of tables for your unit tests.
-But it is not practical - tests will be slow and will consume the read/write operations (and this will cost money).
+
+But this approach is not practical - tests will be slow and will consume the read/write operations (and this will cost money).
 
 Amazon provides a `DynamoDB emulator in java <https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/>`_ but it is problematic to use it during development, because it is slow and consumes a lot of memory.
 
 The solution is a simple in-memory `DynamoDB mock module <dynamo_objects/dynamock.py>`_. 
 It is a fast, but very approximate dynamo emulation without permanent data storage.
 
+To enable the mock, just import the :code:`dynamock` module:
+
+.. code-block:: python
+
+  from dynamo_objects import database
+  # once imported, the `dynamock` module will mock real DynamoDB
+  # operations and forward them to the simple implementation which 
+  # keeps all the data in memory
+  from dynamo_objects import dynamock
+
+There is an example of the mock usage in the `tests/base.py <tests/base.py>`_ module.
+
+This base test module can be used for any project to test parts of code which work with DynamoDB.
 You can find examples of unit tests under the `tests <tests/>`_ folder. The database schema is described in the `tests/schema.py <tests/schema.py>`_.
-The same structure and approach can be used to write unit tests for your project.
 
 There is a helper `test.py <tools/test.py>`_ script to run all unit tests:
 
@@ -290,7 +301,7 @@ I use fast in-memory mock to run tests locally, during the development.
 
 On the CI server tests a launched two times - first against the in-memory mock and then one more time against the DynamoDB local.
 
-Here is a shell script example to to this:
+Here is an example of the shell script to do this:
 
 .. code-block:: bash
 
