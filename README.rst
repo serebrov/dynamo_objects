@@ -104,7 +104,7 @@ Now the record object can be created and used like this:
     store2.name = 'Another Store'
     StoreTable().save(store)
 
-Compare this to pure boto where you have a dictionary-like interface:
+Compare this to the pure boto code where you have a dictionary-like interface:
 
 .. code-block:: python
 
@@ -131,6 +131,22 @@ Find a record, update it and save:
     record = table.get('my_hash', 'my_range')
     record.some_field = 100
     table.save(record)
+
+    # to handle the case when there is no record int the database use
+    # try/except
+    from boto.dynamodb2.exceptions import ItemNotFound
+    try:
+        record = table.get('my_hash', 'my_range')
+    except ItemNotFound:
+        # handle the record not found case
+        # ...
+
+    # sometimes it is more convenient to get None for non-existing record
+    # `find` method will return None if record does not exist
+    record = table.find('my_hash', 'my_range')
+    if record is not None:
+        record.some_field = 100
+        table.save(record)
 
     # get a record or create new one if record does not exist
     record = table.get('my_hash', 'my_range', create=True)
@@ -160,7 +176,7 @@ For example:
     # print user name or 'guest' (default)
     print user.name
 
-Query and scan methods have the same interface as boto's `query_2 <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.query_2>`_ and `scan <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.scan>`, but will convert the resulting record set into :code:`DynamoRecord` objects.
+Query and scan methods have the same interface as boto's `query_2 <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.query_2>`_ and `scan <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html#boto.dynamodb2.table.Table.scan>`_, but will convert the resulting record set into :code:`DynamoRecord` objects.
 
 .. code-block:: python
 
