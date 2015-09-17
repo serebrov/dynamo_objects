@@ -310,7 +310,7 @@ Here is an example of the shell script to do this:
   RESULT_MOCK=$?
   
   # Run slow tests with DynamoDB local
-  pushd paty/to/folder/with/dynamodb-local
+  pushd path/to/folder/with/dynamodb-local
     java -Djava.library.path=./DynamoDBLocal_lib -jar ./DynamoDBLocal.jar -inMemory -sharedDb &
     PID=$!
   popd
