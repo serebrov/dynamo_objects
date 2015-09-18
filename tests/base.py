@@ -1,3 +1,4 @@
+import sys
 import unittest
 from dynamo_objects import database
 
@@ -7,9 +8,9 @@ DYNAMODB_MOCK = bool(os.environ['DYNAMODB_MOCK']) if 'DYNAMODB_MOCK' in os.envir
 
 TABLE_PREFIX = 'zz_unit_test_'
 if DYNAMODB_MOCK:
-    print 'Using mockup db'
+    sys.stdout.writelines('Using mockup db')
 else:
-    print 'Using local dynamodb'
+    sys.stdout.writelines('Using local dynamodb')
 
 if DYNAMODB_MOCK:
     from dynamo_objects import dynamock

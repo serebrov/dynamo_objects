@@ -1,4 +1,3 @@
-from database import ItemNotFound
 import datetime
 
 
@@ -107,9 +106,11 @@ class MemoryTable(KeyValueStorage):
                 item.save(overwrite=overwrite)
             except Exception as e:
                 if ignore_errors:
-                    print e
+                    # print e
+                    return e
                 else:
                     raise
+        return None
 
     def save_data_batch(self, ignore_errors=False, overwrite=False):
         with self.db_table.table.batch_write() as batch:
@@ -119,9 +120,10 @@ class MemoryTable(KeyValueStorage):
                     batch.put_item(item, overwrite=overwrite)
                 except Exception as e:
                     if ignore_errors:
-                        print e
+                        return e
                     else:
                         raise
+        return None
 
     def get_data(self):
         return [item for __, item in self.data.items()]

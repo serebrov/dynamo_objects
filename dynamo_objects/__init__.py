@@ -1,6 +1,6 @@
 from .database import DynamoException, InvalidKeysException
 from .database import DynamoDatabase, DynamoTable, DynamoRecord
-from .database import TablesThroughput
+from .database import TableThroughput
 from .memorydb import MemoryTable
 
 __author__ = 'Boris Serebrov'

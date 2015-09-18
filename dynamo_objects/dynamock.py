@@ -330,7 +330,7 @@ boto.dynamodb2.layer1.DynamoDBConnection = Connection
 boto.dynamodb2.table.Table = Table
 boto.dynamodb2.items.Item = Item
 
-import database
+from dynamo_objects import database
 database.item_to_dict = mock_item_to_dict
 database.Table = Table
 database.Item = Item

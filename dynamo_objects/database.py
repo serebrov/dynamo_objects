@@ -279,7 +279,8 @@ class TableThroughput(object):
                 ):
                     # for some reason local dynamo db does not allow to
                     # increase throughput more than twice
-                    print e.body['Message']
+                    # print e.body['Message']
+                    pass
                 else:
                     raise
         if wait:
