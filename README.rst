@@ -26,6 +26,13 @@ It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`
 
 `Discussion group <https://groups.google.com/forum/#!forum/dynamo_objects>`_
 
+Installation:
+
+.. code-block:: bash
+
+    $ pip install dynamo_objects
+
+
 ================================
 DB Connection an Table Perfixes
 ================================
