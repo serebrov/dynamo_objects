@@ -9,3 +9,5 @@
 .coverage
 tool/dynamodb_local
 dynamo_objects.egg-info
+dist
+build
