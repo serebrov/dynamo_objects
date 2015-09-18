@@ -4,8 +4,8 @@ dynamo_objects
 
 .. image:: https://travis-ci.org/serebrov/dynamo_objects.png?branch=master
     :target: https://travis-ci.org/serebrov/dynamo_objects
-.. image:: https://coveralls.io/repos/serebrov/dynamo_objects/badge.png?branch=devel
-    :target: https://coveralls.io/r/serebrov/dynamo_objects
+.. image:: https://coveralls.io/repos/serebrov/dynamo_objects/badge.svg?branch=master&service=github 
+    :target: https://coveralls.io/github/serebrov/dynamo_objects?branch=master
 .. image:: https://img.shields.io/pypi/v/dynamo-objects.svg
     :target: https://pypi.python.org/pypi/dynamo-objects/
 .. image:: https://img.shields.io/pypi/dm/dynamo-objects.svg
