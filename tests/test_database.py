@@ -17,7 +17,7 @@ class DbTest(BaseDynamoTest):
         e = cm.exception
         self.assertEquals(
             "Hash / range keys for <class 'tests.schema.StoreTable'> are "
-            "invalid or empty: {'store_id': None, None: None}", str(e))
+            "invalid or empty: {'store_id': None, 'None': None}", str(e))
 
     def test_wrong_field_name(self):
         store = Store(store_id=1)

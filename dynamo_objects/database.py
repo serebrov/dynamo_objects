@@ -40,7 +40,9 @@ class InvalidKeysException(DynamoException):
         message = (
             'Hash / range keys for %s are invalid or empty: %s' % (
                 type(record),
-                str(self.keys_data)))
+                "{'%s': %s, '%s': %s}" % (
+                    record.hashkey, hashkey,
+                    record.rangekey, rangekey)))
         super(InvalidKeysException, self).__init__(message)
 
     def is_empty_keys(self):
