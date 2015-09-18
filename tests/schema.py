@@ -1,6 +1,6 @@
 from boto.dynamodb2.fields import HashKey, RangeKey, GlobalAllIndex
-from boto.dynamodb2.types import NUMBER, STRING
-from dynamo_objects.database import DynamoTable, DynamoRecord
+from boto.dynamodb2.types import STRING
+from dynamo_objects.database import DynamoTable, DynamoRecord, DynamoException
 
 
 def normalize_tags(tags):
@@ -105,11 +105,6 @@ class CustomerTable(DynamoTable):
             throughput={'read': 20, 'write': 4},
             record_class=Customer)
 
-    def save(self, record):
-        ts = record._ts or dateutil.now_timestamp()
-        record.updated = ts
-        return super(Customer, self).save(record)
-
 
 class CustomerVisit(DynamoRecord):
 
@@ -121,7 +116,8 @@ class CustomerVisit(DynamoRecord):
 
     def _check_data(self):
         if self.customer_id and self.store_id:
-            self.customer_store = CustomerVisit.get_hash(self.customer_id, self.store_id)
+            self.customer_store = \
+                CustomerVisit.get_hash(self.customer_id, self.store_id)
 
     @staticmethod
     def get_hash(customer_id, store_id):

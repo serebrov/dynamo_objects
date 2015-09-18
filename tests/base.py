@@ -4,7 +4,8 @@ from dynamo_objects import database
 
 import os
 
-DYNAMODB_MOCK = bool(os.environ['DYNAMODB_MOCK']) if 'DYNAMODB_MOCK' in os.environ else True
+DYNAMODB_MOCK = bool(os.environ['DYNAMODB_MOCK']) \
+    if 'DYNAMODB_MOCK' in os.environ else True
 
 TABLE_PREFIX = 'zz_unit_test_'
 if DYNAMODB_MOCK:

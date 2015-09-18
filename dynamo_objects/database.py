@@ -2,6 +2,7 @@ import time
 import copy
 import boto
 
+from boto.dynamodb2 import connect_to_region
 from boto.dynamodb2.table import Table
 from boto.dynamodb2.items import Item
 from boto.dynamodb2.exceptions import ItemNotFound
@@ -9,17 +10,17 @@ from boto.dynamodb2.exceptions import ItemNotFound
 
 def item_to_dict(item, deep=True, set_to_list=False):
     i = dict(item)
-    for n, v in item.items():
-        if type(v) == set:
+    for key, val in item.items():
+        if type(val) == set:
             if set_to_list:
-                i[n] = list(v)
+                i[key] = list(val)
             else:
-                i[n] = v
-        elif type(v) == dict:
+                i[key] = val
+        elif type(val) == dict:
             if deep:
-                i[n] = item_to_dict(v, deep, set_to_list)
+                i[key] = item_to_dict(val, deep, set_to_list)
             else:
-                del i[n]
+                del i[key]
     return i
 
 
@@ -58,7 +59,9 @@ class DynamoDatabase(object):
 
     def get_connection(self):
         if DynamoDatabase._db_connection is None:
-            raise DynamoException('No connection, use connect() method to connect to the database')
+            raise DynamoException(
+                'No connection, use connect() method to connect to '
+                'the database')
         return DynamoDatabase._db_connection
 
     def connect(self, **kwargs):
@@ -66,17 +69,24 @@ class DynamoDatabase(object):
             DynamoDatabase.table_prefix = kwargs['table_prefix']
             del kwargs['table_prefix']
         if DynamoDatabase._db_connection is not None:
-            raise DynamoException('Already connected, use disconnect() before making a new connection')
-        if 'region_name' in kwargs and kwargs['region_name'] == 'localhost': # local dynamodb
-            DynamoDatabase._db_connection = boto.dynamodb2.layer1.DynamoDBConnection(
-                host='localhost',
-                port=kwargs.get('DYNAMODB_PORT', 8000),
-                aws_access_key_id='local',
-                aws_secret_access_key='success',
-                is_secure=False)
+            raise DynamoException(
+                'Already connected, use disconnect() before making a '
+                'new connection')
+        if (
+            'region_name' in kwargs and
+            kwargs['region_name'] == 'localhost'
+        ):
+            # local dynamodb
+            DynamoDatabase._db_connection = \
+                boto.dynamodb2.layer1.DynamoDBConnection(
+                    host='localhost',
+                    port=kwargs.get('DYNAMODB_PORT', 8000),
+                    aws_access_key_id='local',
+                    aws_secret_access_key='success',
+                    is_secure=False)
             DynamoDatabase.local_dynamodb = True
-        else: # Real dynamo db
-            DynamoDatabase._db_connection = boto.dynamodb2.connect_to_region(**kwargs)
+        else:  # Real dynamo db
+            DynamoDatabase._db_connection = connect_to_region(**kwargs)
         self.get_tables()
         return DynamoDatabase._db_connection
 
@@ -95,7 +105,9 @@ class DynamoDatabase(object):
     def get_tables(self):
         DynamoDatabase.tables = self.get_connection().list_tables()
         if not DynamoDatabase.tables:
-            raise DynamoException('Unable to get database tables, connection: %s' % str(DynamoDatabase.db_connection))
+            raise DynamoException(
+                'Unable to get database tables, connection: %s' %
+                str(DynamoDatabase._db_connection))
         return DynamoDatabase.tables['TableNames']
 
     def get_table_name(self, table_name):
@@ -103,25 +115,33 @@ class DynamoDatabase(object):
 
     def exists(self, table_name):
         if self.get_connection():
-            return self.get_table_name(table_name) in DynamoDatabase.tables['TableNames']
+            prefixed_name = self.get_table_name(table_name)
+            return prefixed_name in DynamoDatabase.tables['TableNames']
         return False
 
     def check_exists(self, table):
+        err_type = 'com.amazonaws.dynamodb.v20120810#ResourceNotFoundException'
         try:
             table.describe()
         except boto.exception.JSONResponseError as e:
-            if e.body['__type'] == 'com.amazonaws.dynamodb.v20120810#ResourceNotFoundException':
+            if e.body['__type'] == err_type:
                 return False
             raise
         return True
 
-    def create_table(self, table_name, schema, throughput, indexes=None, global_indexes=None):
-        Table.create(self.get_table_name(table_name), schema=schema, throughput=throughput, connection=self.get_connection(), indexes=indexes, global_indexes=global_indexes)
+    def create_table(
+        self, table_name, schema, throughput, indexes=None, global_indexes=None
+    ):
+        Table.create(
+            self.get_table_name(table_name), schema=schema,
+            throughput=throughput, connection=self.get_connection(),
+            indexes=indexes, global_indexes=global_indexes)
         self.wait_table_active(table_name)
         self.get_tables()
 
     def get_table(self, table_name):
-        return Table(self.get_table_name(table_name), connection=self.get_connection())
+        return Table(
+            self.get_table_name(table_name), connection=self.get_connection())
 
     def get_table_raw(self, table_name):
         return Table(table_name, connection=self.get_connection())
@@ -145,11 +165,13 @@ class DynamoDatabase(object):
         try:
             item_to = table_to.get_item(**key_data)
             if not update:
-                raise DynamoException('Item already exists: %s in %s' % (key_data, table_name_to))
-        except ItemNotFound as inf:
+                raise DynamoException(
+                    'Item already exists: %s in %s' %
+                    (key_data, table_name_to))
+        except ItemNotFound:
             item_to = Item(table_to, key_data)
-        for k, v in item_from.items():
-            item_to[k] = v
+        for key, val in item_from.items():
+            item_to[key] = val
         return item_to
 
     def copy_table_data(
@@ -171,9 +193,6 @@ class DynamoDatabase(object):
                 num_moved += 1
             except:
                 progress.update(0)
-                # skip errors when item already exists
-                # just move the new data
-                #pass
                 raise
         return num_moved
 
@@ -187,7 +206,7 @@ class DynamoDatabase(object):
 
     def delete_table(self, table_name):
         try:
-            self.db.get_table(table_name).delete()
+            self.get_table(table_name).delete()
         except:
             return False
         while True:
@@ -207,9 +226,10 @@ class DynamoDatabase(object):
         }
         if 'GlobalSecondaryIndexes' in info:
             for index_info in info['GlobalSecondaryIndexes']:
+                throughput_info = index_info['ProvisionedThroughput']
                 result[index_info['IndexName']] = {
-                    'read': index_info['ProvisionedThroughput']['ReadCapacityUnits'],
-                    'write': index_info['ProvisionedThroughput']['WriteCapacityUnits']
+                    'read': throughput_info['ReadCapacityUnits'],
+                    'write': throughput_info['WriteCapacityUnits']
                 }
         return result
 
@@ -218,7 +238,10 @@ class TableThroughput(object):
     """
     Can be used to update / restore tables throughput for batch operations.
     """
-    def __init__(self, throughputs, old_throughputs=None, restore=True, wait_enter=True, wait_exit=False):
+    def __init__(
+        self, throughputs, old_throughputs=None,
+        restore=True, wait_enter=True, wait_exit=False
+    ):
         """
         throughputs - {
             'table_name1': {'table': {'write':100,'read':100'}},
@@ -242,7 +265,8 @@ class TableThroughput(object):
             table = self.db.get_table(table_name)
             self._tables[table_name] = table
             if old_throughputs is None:
-                self._old_throughputs[table_name] = self.db.get_table_throughputs(table)
+                self._old_throughputs[table_name] = \
+                    self.db.get_table_throughputs(table)
 
     def __enter__(self):
         self.update_throughputs(self._new_throughputs, self.wait_enter)
@@ -271,12 +295,10 @@ class TableThroughput(object):
                     }
             try:
                 table.update(throughput, gsi)
-            except boto.exception.JSONResponseError as e:
-                if (
-                    e.body["__type"] ==
+            except boto.exception.JSONResponseError as err:
+                is_limit_error = err.body["__type"] == \
                     "com.amazonaws.dynamodb.v20120810#LimitExceededException"
-                    and self.db.is_local_db()
-                ):
+                if is_limit_error and self.db.is_local_db():
                     # for some reason local dynamo db does not allow to
                     # increase throughput more than twice
                     # print e.body['Message']
@@ -286,12 +308,6 @@ class TableThroughput(object):
         if wait:
             for table_name in throughputs:
                 self.db.wait_table_active(table_name)
-
-    def _get_gsi_info(table_info, index_name):
-        for idx in table_info['GlobalSecondaryIndexes']:
-            if idx['IndexName'] == index_name:
-                return idx
-        raise DynamoException('Index %s not found' % index_name)
 
 
 class DynamoRecord(object):
@@ -311,7 +327,6 @@ class DynamoRecord(object):
         exclude = exclude or []
         self._check_data()
         data = copy.copy(self.__dict__)
-        self._check_attrs(data)
         for key in self.__dict__:
             if key.startswith('_') or key in exclude:
                 del data[key]
@@ -326,7 +341,8 @@ class DynamoRecord(object):
     def __setattr__(self, key, value):
         if self._strict_schema and not hasattr(self, key):
             raise DynamoSchemaException(
-                "DynamoRecord %s doesn't have '%s' attribute, can not set it to '%s'" %
+                "DynamoRecord %s doesn't have '%s' attribute, "
+                "can not set it to '%s'" %
                 (self.__class__, key, value)
             )
         object.__setattr__(self, key, value)
@@ -334,7 +350,10 @@ class DynamoRecord(object):
 
 class DynamoTable(object):
 
-    def __init__(self, table_name, schema, throughput, record_class, global_indexes=None):
+    def __init__(
+        self, table_name, schema, throughput,
+        record_class, global_indexes=None
+    ):
         self.db = DynamoDatabase()
         self.table_name = table_name
         self.schema = schema

@@ -58,6 +58,10 @@ class MemoryTable(KeyValueStorage):
     def set_load_from_db(self, do_load):
         self.load_from_db = do_load
 
+    def get_hash(self, *args):
+        keys = self.db_table._check_keys(*args)
+        return super(MemoryTable, self).get_hash(*keys)
+
     def get(self, hashkey, rangekey=None, create=False, times=None):
         start = datetime.datetime.now()
         st = datetime.datetime.now()
@@ -70,7 +74,8 @@ class MemoryTable(KeyValueStorage):
                 st = datetime.datetime.now()
                 self.db_reads += 1
                 if times:
-                    item = self.db_table.get(hashkey, rangekey, create, times=times)
+                    item = self.db_table.get(
+                        hashkey, rangekey, create, times=times)
                 else:
                     item = self.db_table.get(hashkey, rangekey, create)
                 self.put_item(item, hashkey, rangekey)
@@ -116,7 +121,8 @@ class MemoryTable(KeyValueStorage):
         with self.db_table.table.batch_write() as batch:
             for hashkey in self.data:
                 try:
-                    item = self.db_table._get_item_for_record(self.data[hashkey])
+                    item = self.db_table._get_item_for_record(
+                        self.data[hashkey])
                     batch.put_item(item, overwrite=overwrite)
                 except Exception as e:
                     if ignore_errors:

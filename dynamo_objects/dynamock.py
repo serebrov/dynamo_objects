@@ -61,7 +61,10 @@ class Table:
         self.data = connection[table_name]['data']
 
     @classmethod
-    def create(cls, table_name, schema, throughput, connection, indexes=None, global_indexes=None):
+    def create(
+        cls, table_name, schema, throughput, connection,
+        indexes=None, global_indexes=None
+    ):
         connection.create_table(
             table_name=table_name,
             attribute_definitions=schema,
@@ -80,7 +83,9 @@ class Table:
         else:
             if kwargs[self.rangekey] not in self.data[kwargs[self.hashkey]]:
                 raise ItemNotFound()
-            return Item(self, self.data[kwargs[self.hashkey]][kwargs[self.rangekey]])
+            return Item(
+                self,
+                self.data[kwargs[self.hashkey]][kwargs[self.rangekey]])
 
     def _remove_item(self, item):
         if item[self.hashkey] not in self.data:
@@ -123,7 +128,8 @@ class Table:
                 filters.append((field_name, operator, filter_kwargs[key]))
             else:
                 raise Exception(
-                    'Can\'t search by "%s", only hash/range keys are allowed' % field_name
+                    'Can\'t search by "%s", only hash/range keys are allowed' %
+                    field_name
                 )
 
         if hash_value is None and index is None:
@@ -184,7 +190,9 @@ class Table:
                 return False
             elif operator == 'lte' and not (record[field_name] <= value):
                 return False
-            elif operator == 'between' and not ((record[field_name] < value) or (record[field_name] > value)):
+            elif operator == 'between' and not (
+                (record[field_name] < value) or (record[field_name] > value)
+            ):
                 return False
         return True
 
@@ -241,7 +249,8 @@ class Table:
         if self.rangekey == '':
             self.data[final_data[self.hashkey]] = final_data
         else:
-            self.data[final_data[self.hashkey]][final_data[self.rangekey]] = final_data
+            self.data[final_data[self.hashkey]][final_data[self.rangekey]] = \
+                final_data
 
     def __repr__(self):
         return "'%s'" % self.table_name
@@ -267,7 +276,7 @@ class Item(dict):
 
     def _is_storable(self, value):
         if not value:
-            if not value in (0, 0.0, False):
+            if value not in (0, 0.0, False):
                 return False
         return True
 
@@ -323,14 +332,14 @@ class BatchTable(object):
 
 
 # Mock real classes / functions
-import boto.dynamodb2.layer1
-import boto.dynamodb2.table
-import boto.dynamodb2.items
+import boto.dynamodb2.layer1  # noqa
+import boto.dynamodb2.table  # noqa
+import boto.dynamodb2.items  # noqa
 boto.dynamodb2.layer1.DynamoDBConnection = Connection
 boto.dynamodb2.table.Table = Table
 boto.dynamodb2.items.Item = Item
 
-from dynamo_objects import database
+from dynamo_objects import database  # noqa
 database.item_to_dict = mock_item_to_dict
 database.Table = Table
 database.Item = Item
