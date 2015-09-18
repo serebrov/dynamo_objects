@@ -15,6 +15,7 @@ REQUIREMENTS = [
 ]
 
 TEST_REQUIREMENTS = [
+    'nose'
 ]
 
 setup(

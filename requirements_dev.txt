@@ -1,0 +1,7 @@
+pylint==1.1.0
+pep8
+autopep8
+tox
+nose
+bumpversion
+wheel

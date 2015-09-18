@@ -5,4 +5,6 @@
 *.log
 *sqlite.db
 .ropeproject
+.tox
 tool/dynamodb_local
+dynamo_objects.egg-info

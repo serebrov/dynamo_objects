@@ -2,6 +2,11 @@
 dynamo_objects
 ========
 
+.. |build| image:: https://travis-ci.org/serebrov/dynamo_objects.png?branch=master
+.. _build: https://travis-ci.org/serebrov/dynamo_objects
+.. |coverage| image:: https://coveralls.io/repos/serebrov/dynamo_objects/badge.png?branch=master
+.. _coverage: https://coveralls.io/r/serebrov/dynamo_objects?branch=master
+
 dynamo_objects is a set of tools to work with DynamoDB in python.
 
 It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`_ and provides following features:
@@ -279,11 +284,11 @@ There is an example of the mock usage in the `tests/base.py <tests/base.py>`_ mo
 This base test module can be used for any project to test parts of code which work with DynamoDB.
 You can find examples of unit tests under the `tests <tests/>`_ folder. The database schema is described in the `tests/schema.py <tests/schema.py>`_.
 
-There is a helper `test.py <tools/test.py>`_ script to run all unit tests:
+To run all tests use :code:`nosetests` (install with :code:`pip install nose`):
 
 .. code-block:: bash
 
-    ./tool/test.py
+    nosetests
 
 By default it will use the in-memory `DynamoDB mock <dynamo_objects/dynamock.py>`_. 
 To run tests against the  DynamoDB Local use following commands:
@@ -295,7 +300,7 @@ To run tests against the  DynamoDB Local use following commands:
     ./tool/dynamodb-local.sh
 
     # in another terminal window run the tests
-    DYNAMODB_MOCK= ./test.py
+    DYNAMODB_MOCK= nosetests
 
 I use fast in-memory mock to run tests locally, during the development.
 
@@ -306,7 +311,7 @@ Here is an example of the shell script to do this:
 .. code-block:: bash
 
   # Run fast tests with in-memory mock
-  python -m unittest discover -s tests
+  nosetests
   RESULT_MOCK=$?
   
   # Run slow tests with DynamoDB local
@@ -315,7 +320,7 @@ Here is an example of the shell script to do this:
     PID=$!
   popd
   echo "Started local dynamodb: $PID"
-  DYNAMODB_MOCK= python -m unittest discover -s tests
+  DYNAMODB_MOCK= nosetests
   RESULT_LOCALDB=$?
   kill -9 $PID
   exit $(($RESULT_MOCK+$RESULT_LOCALDB))
