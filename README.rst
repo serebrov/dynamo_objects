@@ -26,7 +26,9 @@ It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`
 
 `Discussion group <https://groups.google.com/forum/#!forum/dynamo_objects>`_
 
-Installation:
+================================
+Installation
+================================
 
 .. code-block:: bash
 
@@ -44,9 +46,9 @@ Use the following snippet to connect to the database:
 
 .. code-block:: python
 
-    from dynamo_objects import database
+    from dynamo_objects import DynamoDatabase
 
-    database.Database().connect(
+    DynamoDatabase().connect(
         region_name='your-aws-region-name-here',
         aws_access_key_id='access-key-id',
         aws_secret_access_key='secret-access-key',
@@ -66,10 +68,11 @@ To connect to the DynamoDB Local, specify the region_name='localhost':
 
 .. code-block:: python
 
-        database.Database().connect(
-            region_name='localhost',
-            table_prefix='dev_'
-        )
+    from dynamo_objects import DynamoDatabase
+    DynamoDatabase().connect(
+        region_name='localhost',
+        table_prefix='dev_'
+    )
 
 ================================
 Object Mapper
@@ -78,6 +81,9 @@ Object Mapper
 To use the object mapper, define record and table objects for each DynamoDB table:
 
 .. code-block:: python
+
+  from boto.dynamodb2.fields import HashKey, RangeKey
+  from dynamo_objects import DynamoRecord, DynamoTable
 
   class Store(DynamoRecord):
 
