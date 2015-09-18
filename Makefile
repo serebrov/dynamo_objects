@@ -11,7 +11,12 @@ clean:
 	rm -rf $(DEST)/build
 	rm -rf $(DEST)/dynamo_objects.egg-info
 
+setup:
+	pip install -r requirements.txt
+	pip install -r requirements_dev.txt
+
 publish: clean test
+	python setup.py checkdocs
 	python setup.py sdist
 	# python setup.py bdist_wheel
 	twine upload dist/*

@@ -1,6 +1,6 @@
-========
+================================
 dynamo_objects
-========
+================================
 
 .. image:: https://travis-ci.org/serebrov/dynamo_objects.png?branch=master
     :target: https://travis-ci.org/serebrov/dynamo_objects
@@ -26,9 +26,9 @@ It is based on `boto <http://boto.readthedocs.org/en/latest/ref/dynamodb2.html>`
 
 `Discussion group <https://groups.google.com/forum/#!forum/dynamo_objects>`_
 
-========
-DB Connection and Table Perfixes
-========
+================================
+DB Connection an Table Perfixes
+================================
 
 Database connection method adds table prefix support on top of boto's connect_to_region method.
 Using the table prefix it is possible to switch the application to different set of tables for different environments (or just use different prefixes for different applications).
@@ -64,9 +64,9 @@ To connect to the DynamoDB Local, specify the region_name='localhost':
             table_prefix='dev_'
         )
 
-========
+================================
 Object Mapper
-========
+================================
 
 To use the object mapper, define record and table objects for each DynamoDB table:
 
@@ -213,9 +213,9 @@ And it is also possible to use boto's objects directly:
     # ... 
 
 
-========
+================================
 Memory tables
-========
+================================
 
 Memory tables can be used to cache DynamoDB access in-memory.
 Every record is only read once and no data is written until you call the :code:`save_data` or :code:`save_data_batch` method.
@@ -259,9 +259,9 @@ Now we can do this:
 This can be very useful if you do some computational operations and need to read / write a lot of small objects to the database.
 Depending on the data structure the used read / write throughput and the whole processing time can be noticeably reduced.
 
-========
+================================
 Testing and DynamoDB Mock
-========
+================================
 
 It is possible to run unit tests using the real DynamoDB connection using the table prefixes feature: you can choose some special table prefix like :code:`xx_unit_tests_`. 
 This way you'll have a set of tables for your unit tests.
@@ -330,9 +330,9 @@ Here is an example of the shell script to do this:
   exit $(($RESULT_MOCK+$RESULT_LOCALDB))
 
 
-========
+================================
 Additional Tools
-========
+================================
 
 The `database <https://github.com/dynamo_objects/blob/master/dynamo_objects/database.py>`_ module contains few additional useful tools.
 
@@ -375,9 +375,9 @@ Using the :code:`TableThroughput` it is possible to set high limits just before 
         # now throughputs are low again (same as before the operation)
 
 
-========
+================================
 Related projects
-========
+================================
 
 * `flywheel <https://github.com/mathcamp/flywheel>`_ - Object mapper for Amazon's DynamoDB)
 * `PynamoDB <https://github.com/jlafon/PynamoDB>`_ - A pythonic interface to Amazon's DynamoDB
