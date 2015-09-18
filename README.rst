@@ -94,7 +94,7 @@ Here the :code:`StoreTable` class describes the table: table name, schema (hash 
 And the :code:`Store` class describes the table row, 
 in the :code:`__init__` method we put all the table fields.
 
-See more examples of table/record objects in the `tests/schema.py <tests/schema.py>`_ file.
+See more examples of table/record objects in the `tests/schema.py <https://github.com/dynamo_objects/blob/master/tests/schema.py>`_ file.
 
 Now the record object can be created and used like this:
 
@@ -268,7 +268,7 @@ But this approach is not practical - tests will be slow and will consume the rea
 
 Amazon provides a `DynamoDB emulator in java <https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/>`_ but it is problematic to use it during development, because it is slow and consumes a lot of memory.
 
-The solution is a simple in-memory `DynamoDB mock module <dynamo_objects/dynamock.py>`_. 
+The solution is a simple in-memory `DynamoDB mock module <https://github.com/dynamo_objects/blob/master/dynamo_objects/dynamock.py>`_. 
 It is a fast, but very approximate dynamo emulation without permanent data storage.
 
 To enable the mock, just import the :code:`dynamock` module:
@@ -281,10 +281,10 @@ To enable the mock, just import the :code:`dynamock` module:
   # keeps all the data in memory
   from dynamo_objects import dynamock
 
-There is an example of the mock usage in the `tests/base.py <tests/base.py>`_ module.
+There is an example of the mock usage in the `tests/base.py <https://github.com/dynamo_objects/blob/master/tests/base.py>`_ module.
 
 This base test module can be used for any project to test parts of code which work with DynamoDB.
-You can find examples of unit tests under the `tests <tests/>`_ folder. The database schema is described in the `tests/schema.py <tests/schema.py>`_.
+You can find examples of unit tests under the `tests <https://github.com/dynamo_objects/tree/master/tests/>`_ folder. The database schema is described in the `tests/schema.py <https://github.com/dynamo_objects/blob/master/tests/schema.py>`_.
 
 To run all tests use :code:`nosetests` (install with :code:`pip install nose`):
 
@@ -292,7 +292,7 @@ To run all tests use :code:`nosetests` (install with :code:`pip install nose`):
 
     nosetests
 
-By default it will use the in-memory `DynamoDB mock <dynamo_objects/dynamock.py>`_. 
+By default it will use the in-memory `DynamoDB mock <https://github.com/dynamo_objects/blob/master/dynamo_objects/dynamock.py>`_. 
 To run tests against the  DynamoDB Local use following commands:
 
 .. code-block:: bash
@@ -332,7 +332,7 @@ Here is an example of the shell script to do this:
 Additional Tools
 ========
 
-The `database <dynamo_objects/database.py>`_ module contains few additional useful tools.
+The `database <https://github.com/dynamo_objects/blob/master/dynamo_objects/database.py>`_ module contains few additional useful tools.
 
 The :code:`copy_item` and :code:`copy_table_data` methods allow to copy data from table to table (for example, you may want to copy some data from staging to production):
 
