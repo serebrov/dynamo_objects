@@ -325,8 +325,46 @@ Here is an example of the shell script to do this:
 Additional Tools
 ========
 
-DB - copy table
-TableThroughputs
+The `database <dynamo_objects/database.py>`_ module contains few additional useful tools.
+
+The :code:`copy_item` and :code:`copy_table_data` methods allow to copy data from table to table (for example, you may want to copy some data from staging to production):
+
+.. code-block:: python
+
+    db = database.Database()
+    # note: table_prefix is empty, so we can explicitly set table names
+    database.connect(
+        region_name='...', ...
+        table_prefix='')
+    num_copied = db.copy_table_data('table_name', 'staging_table_name')
+
+    # copy and transform data
+    def transform_fn(record):
+        record.name = 'staging_' + record.name
+    db.copy_table_data('table_name', 'staging_table_name', transform=transform_fn)
+
+There are also some other useful methods to create the table, wait until the new table becomes active, delete the table, etc.
+
+The :code:`TableThroughput` class is a context manager to update (usually set higher) throughput limits and put them back after some operation.
+It is useful when you need to do something what requires a high read/write throughput. 
+
+Using the :code:`TableThroughput` it is possible to set high limits just before the operation and set them back just after it:
+
+.. code-block:: python
+
+        high_throughputs = {
+            'table_one': { 'table': { 'read': 100, 'write': 50, }, },
+            'table_two': {
+                'table': { 'read': 60, 'write': 120, },
+                'SomeGlobalIndex': { 'read': 1, 'write': 120 }
+            }
+        }
+
+        with database.TablesThroughput(high_throughputs):
+            # now throughputs are high
+            some_comutational_operation()
+        # now throughputs are low again (same as before the operation)
+
 
 ========
 Related projects

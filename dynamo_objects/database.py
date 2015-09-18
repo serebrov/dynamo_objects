@@ -47,6 +47,7 @@ class InvalidKeysException(DynamoException):
 
 
 class DynamoDatabase(object):
+
     _db_connection = None
     local_dynamodb = False
     table_prefix = ''
@@ -213,7 +214,7 @@ class DynamoDatabase(object):
         return result
 
 
-class TablesThroughput(object):
+class TableThroughput(object):
     """
     Can be used to update / restore tables throughput for batch operations.
     """
