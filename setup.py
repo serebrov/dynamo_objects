@@ -6,15 +6,6 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist')
-    #os.system('python setup.py bdist_wheel')
-    os.system('twine upload dist/*')
-    print("Now tag me :)")
-    print("  git tag -a {0} -m 'version {0}'".format(__import__('dynamo_objects').__version__))
-    #print("  git push --tags")
-    sys.exit()
-
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
