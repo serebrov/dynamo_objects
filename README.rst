@@ -2,6 +2,8 @@
 dynamo_objects
 ========
 
+Build: |build|_ |coverage|_
+
 .. |build| image:: https://travis-ci.org/serebrov/dynamo_objects.png?branch=master
 .. _build: https://travis-ci.org/serebrov/dynamo_objects
 .. |coverage| image:: https://coveralls.io/repos/serebrov/dynamo_objects/badge.png?branch=master
