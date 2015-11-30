@@ -20,8 +20,8 @@ TEST_REQUIREMENTS = [
 
 setup(
     name='dynamo_objects',
-    version=__import__('dynamo_objects').__version__,
-    packages=find_packages(exclude=('tests','tool')),
+    version='1.0.5',
+    packages=find_packages(exclude=('tests', 'tool')),
     url='https://github.com/serebrov/dynamo_objects',
     author='Boris Serebrov',
     author_email='dynamo_objects@googlegroups.com',
