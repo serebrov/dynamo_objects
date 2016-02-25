@@ -210,8 +210,23 @@ Query and scan methods have the same interface as boto's `query_2 <http://boto.r
     records = table.query(hash__eq='value', range__gte=50)
     ...
     records = table.scan(some_field__gte=10)
+    ...
+    # get count
+    count = table.query_count(hash__eq='value', range__gte=50)
 
-And it is also possible to use boto's objects directly:
+Table object also supports the atomic counter update: 
+
+.. code-block:: python
+
+    # increment the `counter_name` field by 2 for the 
+    # item with hash key = `myhashkey`
+    table.update_counter('myhashkey', counter_name=2)
+
+    # decrement the `counter_name` field by 2 for the 
+    # item with hash key = `myhashkey` and rangekey = 'myrange'
+    table.update_counter('myhashkey', 'myrange', counter_name=-2)
+
+And it is possible to use boto's objects directly:
 
 .. code-block:: python
 

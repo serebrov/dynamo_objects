@@ -37,6 +37,12 @@ class UpdateCountersTest(BaseDynamoTest):
         customer = self.table.get('CUSTOMER1')
         self.assertEquals(10, customer.thanks_count)
 
+    def test_counter_dec(self):
+        self.table.update_counter('CUSTOMER1', thanks_count=5)
+        self.table.update_counter('CUSTOMER1', thanks_count=-1)
+        customer = self.table.get('CUSTOMER1')
+        self.assertEquals(4, customer.thanks_count)
+
 
 if __name__ == "__main__":
     unittest.main()
