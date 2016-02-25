@@ -78,6 +78,7 @@ class Customer(DynamoRecord):
 
     def __init__(self, **data):
         self.customer_id = ''
+        self.age = 0
         self.first_name = ''
         self.last_name = ''
         self.email = ''
@@ -102,7 +103,7 @@ class CustomerTable(DynamoTable):
     def __init__(self):
         super(CustomerTable, self).__init__(
             'customer',
-            schema=[HashKey('customer_id')],
+            schema=[HashKey('customer_id'), RangeKey('age')],
             throughput={'read': 20, 'write': 4},
             record_class=Customer)
 
