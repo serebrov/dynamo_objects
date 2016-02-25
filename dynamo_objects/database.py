@@ -422,6 +422,9 @@ class DynamoTable(object):
         for item in items:
             yield self._create_record_for_item(item)
 
+    def query_count(self, **kwargs):
+        return self.table.query_count(**kwargs)
+
     def scan(self, **kwargs):
         items = self.table.scan(**kwargs)
         for item in items:

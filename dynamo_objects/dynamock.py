@@ -178,6 +178,9 @@ class Table:
             filters.append((field_name, operator, filter_kwargs[key]))
         return self.search_by_filters(filters)
 
+    def query_count(self, **kwargs):
+        return len(self.query_2(**kwargs))
+
     def search_by_filters(self, filters):
         results = []
         for hash_key in self.data:

@@ -46,6 +46,10 @@ class QueryTest(BaseDynamoTest):
         for store in data:
             self.assertEquals(self.expected[store['store_id']], store)
 
+    def test_query_count(self):
+        self.assertEquals(1, self.table.query_count(
+            company_id__eq='YRC', index='StoreCompanyIndex'))
+
 
 if __name__ == "__main__":
     unittest.main()
