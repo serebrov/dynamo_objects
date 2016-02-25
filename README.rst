@@ -36,7 +36,7 @@ Installation
 
 
 ================================
-DB Connection an Table Perfixes
+DB Connection and Table Perfixes
 ================================
 
 Database connection method adds table prefix support on top of boto's connect_to_region method.
@@ -392,6 +392,6 @@ Using the :code:`TableThroughput` it is possible to set high limits just before 
 Related projects
 ================================
 
-* `flywheel <https://github.com/mathcamp/flywheel>`_ - Object mapper for Amazon's DynamoDB)
+* `flywheel <https://github.com/mathcamp/flywheel>`_ - Object mapper for Amazon's DynamoDB
 * `PynamoDB <https://github.com/jlafon/PynamoDB>`_ - A pythonic interface to Amazon's DynamoDB
 * `Dynamodb-mapper <https://bitbucket.org/Ludia/dynamodb-mapper/overview>`_ Dynamodb-mapper - a DynamoDB object mapper, based on boto
