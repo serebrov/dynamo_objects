@@ -79,13 +79,15 @@ class DynamoDatabase(object):
             kwargs['region_name'] == 'localhost'
         ):
             # local dynamodb
+            debug = kwargs['debug'] if 'debug' in kwargs else 0
             DynamoDatabase._db_connection = \
                 boto.dynamodb2.layer1.DynamoDBConnection(
                     host='localhost',
                     port=kwargs.get('DYNAMODB_PORT', 8000),
                     aws_access_key_id='local',
                     aws_secret_access_key='success',
-                    is_secure=False)
+                    is_secure=False,
+                    debug=debug)
             DynamoDatabase.local_dynamodb = True
         else:  # Real dynamo db
             DynamoDatabase._db_connection = connect_to_region(**kwargs)
@@ -422,6 +424,18 @@ class DynamoTable(object):
     def scan(self, **kwargs):
         items = self.table.scan(**kwargs)
         return map(lambda item: self._create_record_for_item(item), items)
+
+    def update_counter(self, hashkey, rangekey=None, **kwargs):
+        counter = kwargs.keys()[0]
+        inc = kwargs.values()[0]
+        connection = self.db.get_connection()
+        self.db.get_connection().update_item(
+            table_name=self.db.get_table_name(self.table_name),
+            key=self._get_keys_dict(hashkey, rangekey),
+            update_expression="SET #counter = #counter + :inc",
+            expression_attribute_names={'#counter': counter},
+            expression_attribute_values={':inc': {'N': kwargs[counter]}},
+            return_values="UPDATED_NEW")
 
     def _get_boto_item(self, keys_data):
         return self.table.get_item(**keys_data)

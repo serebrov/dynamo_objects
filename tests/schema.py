@@ -83,11 +83,12 @@ class Customer(DynamoRecord):
         self.email = ''
         self.gender = ''
         self.updated = 0
+        self.thanks_count = 0
         self._ts = None
         self.employee_at_store = ''
         super(Customer, self).__init__(**data)
 
-    def _freeze_schema(self, data):
+    def _freeze_schema(self):
         # we actually go schema-less here and allow any fields
         pass
 
