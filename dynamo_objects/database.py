@@ -419,11 +419,13 @@ class DynamoTable(object):
 
     def query(self, **kwargs):
         items = self.table.query_2(**kwargs)
-        return map(lambda item: self._create_record_for_item(item), items)
+        for item in items:
+            yield self._create_record_for_item(item)
 
     def scan(self, **kwargs):
         items = self.table.scan(**kwargs)
-        return map(lambda item: self._create_record_for_item(item), items)
+        for item in items:
+            yield self._create_record_for_item(item)
 
     def update_counter(self, hashkey, rangekey=None, **kwargs):
         counter = kwargs.keys()[0]
