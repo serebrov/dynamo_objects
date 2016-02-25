@@ -60,13 +60,14 @@ class Connection(dict):
            Warning: support is very limited, only to counter updates
         """
         table = Table(table_name, self)
-        table._update_item(key, attribute_updates,
-                    expected, conditional_operator,
-                    return_values, return_consumed_capacity,
-                    return_item_collection_metrics,
-                    update_expression, condition_expression,
-                    expression_attribute_names,
-                    expression_attribute_values)
+        table.update_item(
+            key, attribute_updates,
+            expected, conditional_operator,
+            return_values, return_consumed_capacity,
+            return_item_collection_metrics,
+            update_expression, condition_expression,
+            expression_attribute_names,
+            expression_attribute_values)
 
 
 class Table:
@@ -271,7 +272,7 @@ class Table:
             self.data[final_data[self.hashkey]][final_data[self.rangekey]] = \
                 final_data
 
-    def _update_item(self, key, attribute_updates=None,
+    def update_item(self, key, attribute_updates=None,
                     expected=None, conditional_operator=None,
                     return_values=None, return_consumed_capacity=None,
                     return_item_collection_metrics=None,
@@ -281,16 +282,16 @@ class Table:
         """Update item low-level method.
            Warning: support is very limited, only for counter updates
         """
-        #print update_expression, expression_attribute_values
+        # print update_expression, expression_attribute_values
         item = self.get_item(**key)
         # expression is like SET a = a + :a SET b = b + :b'
         try:
             key, val = update_expression.split('=')[1].split('+')
         except IndexError:
             raise Exception(
-                '_update_item is limited to counter updates, '
+                'Table.update_item is limited to counter updates, '
                 'expressions like SET a = a + :val')
-        key, val = key.strip(), val.strip() #  ':' + val.strip().split(':')[1]
+        key, val = key.strip(), val.strip()
         if expression_attribute_names and key in expression_attribute_names:
             key = expression_attribute_names[key]
         val = expression_attribute_values[val]

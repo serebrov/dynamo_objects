@@ -428,8 +428,8 @@ class DynamoTable(object):
             yield self._create_record_for_item(item)
 
     def update_counter(self, hashkey, rangekey=None, **kwargs):
-        counter = kwargs.keys()[0]
-        inc = kwargs.values()[0]
+        counter = list(kwargs.keys())[0]
+        inc = list(kwargs.values())[0]
         connection = self.db.get_connection()
         self.db.get_connection().update_item(
             table_name=self.db.get_table_name(self.table_name),
