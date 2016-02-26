@@ -288,6 +288,8 @@ class Table:
         """
         dyn = Dynamizer()
         # print update_expression, expression_attribute_values
+        for name in key:
+            key[name] = dyn.decode(key[name])
         item = self.get_item(**key)
         # expression is like SET a = a + :a SET b = b + :b'
         try:
