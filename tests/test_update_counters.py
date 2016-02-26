@@ -16,10 +16,10 @@ class UpdateCountersTest(BaseDynamoTest):
     def test_raw(self):
         self.db.get_connection().update_item(
             self.db.get_table_name('customer'),
-            {'customer_id': 'CUSTOMER1', 'age': 22},
+            {'customer_id': {"S": "CUSTOMER1"}, 'age': {"N": "22"}},
             update_expression='SET #count = #count + :inc ',
             expression_attribute_names={'#count': 'thanks_count'},
-            expression_attribute_values={':inc': {'N': 1}},
+            expression_attribute_values={':inc': {'N': "1"}},
             return_values="UPDATED_NEW")
         customer = self.table.get('CUSTOMER1', 22)
         self.assertEquals(1, customer.thanks_count)

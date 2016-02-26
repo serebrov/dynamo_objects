@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from boto.dynamodb2.fields import HashKey, RangeKey
 from boto.dynamodb2.exceptions import ItemNotFound
+from boto.dynamodb.types import Dynamizer
 
 
 def mock_item_to_dict(item, deep=True, set_to_list=False):
@@ -285,6 +286,7 @@ class Table:
         """Update item low-level method.
            Warning: support is very limited, only for counter updates
         """
+        dyn = Dynamizer()
         # print update_expression, expression_attribute_values
         item = self.get_item(**key)
         # expression is like SET a = a + :a SET b = b + :b'
@@ -298,7 +300,7 @@ class Table:
         if expression_attribute_names and key in expression_attribute_names:
             key = expression_attribute_names[key]
         val = expression_attribute_values[val]
-        item[key] += val['N']
+        item[dyn.decode(key)] += dyn.decode(val)
         item.save()
 
     def __repr__(self):

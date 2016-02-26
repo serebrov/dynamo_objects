@@ -1,5 +1,5 @@
 from boto.dynamodb2.fields import HashKey, RangeKey, GlobalAllIndex
-from boto.dynamodb2.types import STRING
+from boto.dynamodb2.types import STRING, NUMBER
 from dynamo_objects.database import DynamoTable, DynamoRecord, DynamoException
 
 
@@ -103,7 +103,7 @@ class CustomerTable(DynamoTable):
     def __init__(self):
         super(CustomerTable, self).__init__(
             'customer',
-            schema=[HashKey('customer_id'), RangeKey('age')],
+            schema=[HashKey('customer_id'), RangeKey('age', data_type=NUMBER)],
             throughput={'read': 20, 'write': 4},
             record_class=Customer)
 

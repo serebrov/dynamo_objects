@@ -6,6 +6,7 @@ from boto.dynamodb2 import connect_to_region
 from boto.dynamodb2.table import Table
 from boto.dynamodb2.items import Item
 from boto.dynamodb2.exceptions import ItemNotFound
+from boto.dynamodb.types import Dynamizer
 
 
 def item_to_dict(item, deep=True, set_to_list=False):
@@ -431,15 +432,19 @@ class DynamoTable(object):
             yield self._create_record_for_item(item)
 
     def update_counter(self, hashkey, rangekey=None, **kwargs):
+        dyn = Dynamizer()
         counter = list(kwargs.keys())[0]
         inc = list(kwargs.values())[0]
         connection = self.db.get_connection()
+        keys = self._get_keys_dict(hashkey, rangekey)
+        for key in keys:
+            keys[key] = dyn.encode(keys[key])
         self.db.get_connection().update_item(
             table_name=self.db.get_table_name(self.table_name),
-            key=self._get_keys_dict(hashkey, rangekey),
+            key=keys,
             update_expression="SET #counter = #counter + :inc",
             expression_attribute_names={'#counter': counter},
-            expression_attribute_values={':inc': {'N': kwargs[counter]}},
+            expression_attribute_values={':inc': dyn.encode(kwargs[counter])},
             return_values="UPDATED_NEW")
 
     def _get_boto_item(self, keys_data):
