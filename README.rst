@@ -36,7 +36,7 @@ Installation
 
 
 ================================
-DB Connection and Table Perfixes
+DB Connection and Table Prefixes
 ================================
 
 Database connection method adds table prefix support on top of boto's connect_to_region method.
