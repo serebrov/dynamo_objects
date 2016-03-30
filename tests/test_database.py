@@ -24,6 +24,11 @@ class DbTest(BaseDynamoTest):
         with self.assertRaises(database.DynamoSchemaException):
             store.ctiy = 'test'
 
+    def test_wrong_field_name_update_data(self):
+        store = Store(store_id=1)
+        with self.assertRaises(database.DynamoSchemaException):
+            store.update_data(**{'ctiy': 'test'})
+
 
 if __name__ == "__main__":
     unittest.main()

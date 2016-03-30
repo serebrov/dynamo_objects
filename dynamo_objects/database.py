@@ -326,7 +326,8 @@ class DynamoRecord(object):
         self._check_data()
 
     def update_data(self, **data):
-        self.__dict__.update(data)
+        for key in data:
+            setattr(self, key, data[key])
 
     def get_dict(self, exclude=None):
         exclude = exclude or []
