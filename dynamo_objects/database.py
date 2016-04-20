@@ -323,20 +323,26 @@ class DynamoRecord(object):
         self._item = None
         self._freeze_schema()
         self.update_data(**data)
-        self._check_data()
 
     def update_data(self, **data):
         for key in data:
             setattr(self, key, data[key])
+        self._check_data()
 
     def update_data_safe(self, **data):
         for key in data:
             if self._strict_schema and not hasattr(self, key):
                 continue
             setattr(self, key, data[key])
+        self._check_data()
 
     def get_dict(self, exclude=None):
         exclude = exclude or []
+        # this is for the case when the value was assigned directly,
+        # like `obj.field = '1'`
+        # and (for example) in the _check_data it can be converted to integer
+        # the get_dict is also used when saving to the database,
+        # so the conversion will be done before saving
         self._check_data()
         data = copy.copy(self.__dict__)
         for key in self.__dict__:
