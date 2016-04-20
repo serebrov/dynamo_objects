@@ -329,6 +329,12 @@ class DynamoRecord(object):
         for key in data:
             setattr(self, key, data[key])
 
+    def update_data_safe(self, **data):
+        for key in data:
+            if self._strict_schema and not hasattr(self, key):
+                continue
+            setattr(self, key, data[key])
+
     def get_dict(self, exclude=None):
         exclude = exclude or []
         self._check_data()
@@ -532,6 +538,7 @@ class DynamoTable(object):
         # if item is None:
         #     return None
         cls = self.record_class
-        obj = cls(**item_to_dict(item))
+        obj = cls()
+        obj.update_data_safe(**item_to_dict(item))
         obj._item = item
         return obj
