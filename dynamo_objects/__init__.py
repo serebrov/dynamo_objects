@@ -5,4 +5,4 @@ from .memorydb import MemoryTable
 
 __author__ = 'Boris Serebrov'
 __license__ = 'MIT'
-__version__ = '1.0.12'
+__version__ = '1.0.13'

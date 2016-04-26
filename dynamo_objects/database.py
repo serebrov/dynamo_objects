@@ -83,7 +83,7 @@ class DynamoDatabase(object):
             debug = kwargs['debug'] if 'debug' in kwargs else 0
             DynamoDatabase._db_connection = \
                 boto.dynamodb2.layer1.DynamoDBConnection(
-                    host='localhost',
+                    host=kwargs.get('DYNAMODB_HOST', 'localhost'),
                     port=kwargs.get('DYNAMODB_PORT', 8000),
                     aws_access_key_id='local',
                     aws_secret_access_key='success',

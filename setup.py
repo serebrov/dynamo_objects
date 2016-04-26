@@ -20,7 +20,7 @@ TEST_REQUIREMENTS = [
 
 setup(
     name='dynamo_objects',
-    version='1.0.12',
+    version='1.0.13',
     packages=find_packages(exclude=('tests', 'tool')),
     url='https://github.com/serebrov/dynamo_objects',
     author='Boris Serebrov',
@@ -37,8 +37,7 @@ setup(
         'Programming Language :: Python',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'License :: OSI Approved :: MIT License',
         'Topic :: Database'
     ],
