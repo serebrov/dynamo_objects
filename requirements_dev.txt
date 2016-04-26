@@ -7,3 +7,4 @@ bumpversion
 wheel
 pygments
 collective.checkdocs
+twine
