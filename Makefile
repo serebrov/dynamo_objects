@@ -15,6 +15,9 @@ setup:
 	pip install -r requirements.txt
 	pip install -r requirements_dev.txt
 
+version:
+	bumpversion patch
+
 publish: clean test
 	python setup.py checkdocs
 	python setup.py sdist
