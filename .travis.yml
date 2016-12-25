@@ -12,3 +12,4 @@ script:
   - ./tool/test-ci.sh
 after_success:
   if [ "$TOXENV" == "py27" ]; then coveralls; fi
+  - bash <(curl -s https://codecov.io/bash)
