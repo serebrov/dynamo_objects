@@ -1,10 +1,15 @@
 import datetime
 
+from boto.dynamodb2.exceptions import ItemNotFound
+
+NOT_FOUND = 'missing'
+
 
 class KeyValueStorage(object):
 
     def __init__(self):
         self.data = {}
+        self.db_table = None
 
     def get_hash(self, *args):
         keys = self.db_table._check_keys(*args)
@@ -44,8 +49,8 @@ class KeyValueStorage(object):
 
 
 class MemoryTable(KeyValueStorage):
-
     db_reads = 0
+    hits = 0
 
     def __init__(self, db_table):
         self.db_table = db_table
@@ -66,9 +71,14 @@ class MemoryTable(KeyValueStorage):
         start = datetime.datetime.now()
         st = datetime.datetime.now()
         item = self.get_item(hashkey, rangekey)
+        if item == NOT_FOUND:
+            self.hits += 1
+            if not create:
+                raise ItemNotFound
+            item = None
         en = datetime.datetime.now()
         if times:
-            times['mem_get_item'] += (en-st).total_seconds()
+            times['mem_get_item'] += (en - st).total_seconds()
         if item is None:
             if self.load_from_db:
                 st = datetime.datetime.now()
@@ -77,21 +87,27 @@ class MemoryTable(KeyValueStorage):
                     item = self.db_table.get(
                         hashkey, rangekey, create, times=times)
                 else:
-                    item = self.db_table.get(hashkey, rangekey, create)
+                    try:
+                        item = self.db_table.get(hashkey, rangekey, create)
+                    except:
+                        self.put_item(NOT_FOUND, hashkey, rangekey)
+                        raise
                 self.put_item(item, hashkey, rangekey)
                 en = datetime.datetime.now()
                 if times:
-                    times['mem_get_from_db'] += (en-st).total_seconds()
+                    times['mem_get_from_db'] += (en - st).total_seconds()
             else:
                 st = datetime.datetime.now()
                 item = self.db_table._create_record(hashkey, rangekey)
                 self.put_item(item, hashkey, rangekey)
                 en = datetime.datetime.now()
                 if times:
-                    times['mem_create_record'] += (en-st).total_seconds()
+                    times['mem_create_record'] += (en - st).total_seconds()
+        else:
+            self.hits += 1
         end = datetime.datetime.now()
         if times:
-            times['mem_total'] += (end-start).total_seconds()
+            times['mem_total'] += (end - start).total_seconds()
         return item
 
     def delete(self, hashkey, rangekey=None):
@@ -101,17 +117,22 @@ class MemoryTable(KeyValueStorage):
 
     def save(self, item):
         keys = self.db_table._get_record_keys(item)
-        if not self.has_item(*keys):
+        hashkey = self.get_hash(*keys)
+        existed = self.data.get(hashkey)
+        if existed == NOT_FOUND:
+            del (self.data[hashkey])
+        if existed in [NOT_FOUND, None]:
             self.put_item(item, *keys)
 
     def save_data(self, ignore_errors=False, overwrite=False):
         for hashkey in self.data:
             try:
+                if self.data[hashkey] == NOT_FOUND:
+                    continue
                 item = self.db_table._get_item_for_record(self.data[hashkey])
                 item.save(overwrite=overwrite)
             except Exception as e:
                 if ignore_errors:
-                    # print e
                     return e
                 else:
                     raise
@@ -121,8 +142,10 @@ class MemoryTable(KeyValueStorage):
         with self.db_table.table.batch_write() as batch:
             for hashkey in self.data:
                 try:
-                    item = self.db_table._get_item_for_record(
-                        self.data[hashkey])
+                    if self.data[hashkey] == NOT_FOUND:
+                        continue
+                    item = \
+                        self.db_table._get_item_for_record(self.data[hashkey])
                     batch.put_item(item, overwrite=overwrite)
                 except Exception as e:
                     if ignore_errors:
