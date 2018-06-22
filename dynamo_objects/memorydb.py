@@ -2,7 +2,6 @@ import datetime
 
 from boto.dynamodb2.exceptions import ItemNotFound
 
-
 NOT_FOUND = 'missing'
 
 
@@ -10,6 +9,7 @@ class KeyValueStorage(object):
 
     def __init__(self):
         self.data = {}
+        self.db_table = None
 
     def get_hash(self, *args):
         keys = self.db_table._check_keys(*args)
@@ -49,7 +49,6 @@ class KeyValueStorage(object):
 
 
 class MemoryTable(KeyValueStorage):
-
     db_reads = 0
     hits = 0
 
@@ -145,7 +144,8 @@ class MemoryTable(KeyValueStorage):
                 try:
                     if self.data[hashkey] == NOT_FOUND:
                         continue
-                    item = self.db_table._get_item_for_record(self.data[hashkey])
+                    item = \
+                        self.db_table._get_item_for_record(self.data[hashkey])
                     batch.put_item(item, overwrite=overwrite)
                 except Exception as e:
                     if ignore_errors:
