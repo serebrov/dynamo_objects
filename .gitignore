@@ -11,3 +11,4 @@ tool/dynamodb_local
 dynamo_objects.egg-info
 dist
 build
+.mypy_cache
